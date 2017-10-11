@@ -3,15 +3,6 @@ class MoviesController < ApplicationController
   def index
     @movies = Movie.all
   end
-  
-  # add below all other methods
-private
-
-  def movie_params
-    params.require(:movie).permit(:title, :rating, :description, :release_date)
-  end
-  
-  # in app/controllers/movies_controller.rb
 
   def show
   id = params[:id] # retrieve movie ID from URI route
@@ -25,7 +16,8 @@ private
   end 
 
   def create
-    @movie = Movie.create!(params[:movie])
+    #@movie = Movie.create!(params[:movie]) #old way
+    @movie = Movie.create!(movie_params)  # new way
     flash[:notice] = "#{@movie.title} was successfully created."
     redirect_to movies_path
   end
@@ -36,7 +28,7 @@ private
 
   def update
   @movie = Movie.find params[:id]
-  @movie.update_attributes!(params[:movie])
+  @movie.update_attributes!(movie_params)
   respond_to do |client_wants|
     client_wants.html {  redirect_to movie_path(@movie)  } # as before
     client_wants.xml  {  render :xml => @movie.to_xml    }
@@ -49,4 +41,11 @@ private
   flash[:notice] = "Movie '#{@movie.title}' deleted."
   redirect_to movies_path
   end
+  
+  private
+
+  def movie_params
+    params.require(:movie).permit(:title, :rating, :description, :release_date)
+  end
+  
 end
